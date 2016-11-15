@@ -1,0 +1,76 @@
+<!-- views/pages/ng.ejs -->
+
+<html lang="en" ng-app='app'>
+<head>
+   <% include ../partials/globals %>
+</head>
+<body class="container">
+
+    <header>
+        <% include ../partials/header %>
+    </header>
+
+    <main>
+        <div class="jumbotron">
+            <h1>Hello to Express and AngularJS</h1>
+            <p>Below is an example of angularjs client-side functionality</p>
+            Enter Text: <input ng-model="echoText"> {{ echoText }}
+        </div>
+        <div>
+            <ng-view></ng-view>
+        </div>
+    </main>
+
+    <footer>
+        <% include ../partials/footer %>
+    </footer>
+
+<!-- Template -->
+<script type="text/ng-template" id="/todos.html">
+Search: <input type="text" ng-model="search.name">
+  <ul>
+    <li ng-repeat="todo in todos | filter: search">
+      <input type="checkbox" ng-model="todo.completed"><a href="#/{{$index}}">{{todo.name}}</a>
+    </li>
+  </ul>
+</script>
+
+<script type="text/ng-template" id="/todoDetails.html">
+  <h1>{{ todo.name }}</h1>
+  completed: <input type="checkbox" ng-model="todo.completed">
+  note: <textarea>{{ todo.note }}</textarea>
+</script>
+    
+<script>
+angular.module('app', ['ngRoute'])
+    .factory('Todos', function(){
+        return [
+            { name: 'Master HTML/CSS/Javascript', completed: true, note: 'add notes...' },
+            { name: 'Learn AngularJS', completed: false, note: 'add notes...' },
+            { name: 'Build NodeJS backend', completed: false, note: 'add notes...' },
+            { name: 'Get started with ExpressJS', completed: false, note: 'add notes...' },
+            { name: 'Setup MongoDB database', completed: false, note: 'add notes...' },
+            { name: 'Be awesome!', completed: false, note: 'add notes...' },
+        ];
+        })
+    .controller('TodoController', ['$scope', 'Todos', function ($scope, Todos) {
+        $scope.todos = Todos;
+    }])
+    //insert the following code below the first controller
+    .controller('TodoDetailCtrl', ['$scope', '$routeParams', 'Todos', function ($scope, $routeParams, Todos) {
+        $scope.todo = Todos[$routeParams.index];
+    }])
+    .config(['$routeProvider', function ($routeProvider) {
+      $routeProvider
+        .when('/', {
+          templateUrl: '/todos.html',
+          controller: 'TodoController'
+        })
+        .when('/:index', {
+            templateUrl: '/todoDetails.html',
+            controller: 'TodoDetailCtrl'
+        }); 
+    }]);
+</script>
+</body>
+</html>
